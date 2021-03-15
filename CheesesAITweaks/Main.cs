@@ -23,6 +23,10 @@ public class CheesesAISettings
 
     public bool rockWingsOnContact = true;
 
+    public CheesesAITweaks.DropTankMode dropTankMode = CheesesAITweaks.DropTankMode.DropOnContact;
+
+    public bool enemyEjectorSeats = true;
+
     public CheesesAITweaks.CollisionMode collisionMode = CheesesAITweaks.CollisionMode.Normal;
 
     public bool invertedAI = false;
@@ -36,7 +40,15 @@ public class CheesesAITweaks : VTOLMOD
         CollidersAlwaysOff
     }
 
+    public enum DropTankMode
+    {
+        Normal,
+        DropOnContact
+        //DropOnMerge
+    }
+
     public static CheesesAISettings settings;
+    public static CheesesAITweaks instance;
 
     public bool settingsChanged;
 
@@ -50,6 +62,10 @@ public class CheesesAITweaks : VTOLMOD
     public UnityAction<int> controlNoiseLayers_changed;
 
     public UnityAction<bool> rockWingsOnContact_changed;
+
+    public UnityAction<int> dropTankMode_changed;
+
+    public UnityAction<bool> enemyEjectorSeats_changed;
 
     public UnityAction<int> collisionMode_changed;
 
@@ -65,6 +81,8 @@ public class CheesesAITweaks : VTOLMOD
         harmony.PatchAll(Assembly.GetExecutingAssembly());
 
         Debug.Log("Patched the AI");
+
+        instance = this;
 
         base.ModLoaded();
         VTOLAPI.SceneLoaded += SceneLoaded;
@@ -113,10 +131,26 @@ public class CheesesAITweaks : VTOLMOD
         
         rockWingsOnContact_changed += rockWingsOnContact_Setting;
         modSettings.CreateCustomLabel("Rock wings on contact:");
-        modSettings.CreateBoolSetting("(Default = true)", controlNoiseEnabled_changed, settings.rockWingsOnContact);
+        modSettings.CreateBoolSetting("(Default = true)", rockWingsOnContact_changed, settings.rockWingsOnContact);
 
         modSettings.CreateCustomLabel("");
-        
+
+
+        dropTankMode_changed += dropTankMode_Setting;
+        modSettings.CreateCustomLabel("Drop Tank Mode:");
+        modSettings.CreateIntSetting("(Default = 0)", dropTankMode_changed, (int)settings.dropTankMode, 0, 1);
+        modSettings.CreateCustomLabel("0 = Normal (Only drop when empty)");
+        modSettings.CreateCustomLabel("1 = Drop On Contact");
+
+        modSettings.CreateCustomLabel("");
+
+
+        enemyEjectorSeats_changed += enemyEjectorSeats_Setting;
+        modSettings.CreateCustomLabel("Enemy Aircraft Ejector Seats:");
+        modSettings.CreateBoolSetting("(Default = true)", enemyEjectorSeats_changed, settings.enemyEjectorSeats);
+
+        modSettings.CreateCustomLabel("");
+
 
         collisionMode_changed += collisionMode_Setting;
         modSettings.CreateCustomLabel("Collsion Mode:");
@@ -127,15 +161,17 @@ public class CheesesAITweaks : VTOLMOD
 
         modSettings.CreateCustomLabel("");
 
+        modSettings.CreateCustomLabel("AI aircraft don't have collisions on the ground normally,");
+        modSettings.CreateCustomLabel("You can enable them, but the AI could get stuck on missions with many taxiing aircraft");
+        modSettings.CreateCustomLabel("You can enable them, but the AI could get stuck on missions with many taxiing aircraft");
+
+        modSettings.CreateCustomLabel("");
+
+
         invertedAI_changed += invertedAI_Setting;
         modSettings.CreateCustomLabel("Inverted AI:");
         modSettings.CreateCustomLabel("Causes AI the fly upside down");
         modSettings.CreateBoolSetting("(Default = false)", invertedAI_changed, settings.invertedAI);
-
-        modSettings.CreateCustomLabel("");
-
-        modSettings.CreateCustomLabel("AI aircraft don't have collisions on the ground normally,");
-        modSettings.CreateCustomLabel("You can enable them, but the AI could get stuck on missions with many taxiing aircraft");
 
         modSettings.CreateCustomLabel("");
 
@@ -247,6 +283,18 @@ public class CheesesAITweaks : VTOLMOD
         settingsChanged = true;
     }
 
+    public void dropTankMode_Setting(int newval)
+    {
+        settings.dropTankMode = (DropTankMode)newval;
+        settingsChanged = true;
+    }
+
+    public void enemyEjectorSeats_Setting(bool newval)
+    {
+        settings.enemyEjectorSeats = newval;
+        settingsChanged = true;
+    }
+
     public void collisionMode_Setting(int newval)
     {
         settings.collisionMode = (CollisionMode)newval;
@@ -257,5 +305,20 @@ public class CheesesAITweaks : VTOLMOD
     {
         settings.invertedAI = newval;
         settingsChanged = true;
+    }
+
+    public void AddEjectorSeat(Health health, Rigidbody rb, Vector3 position)
+    {
+        Debug.Log("Trying to get ejector seat!");
+        GameObject ejectorSeatPrefab = UnitCatalogue.GetUnitPrefab("FA-26B AI").GetComponentInChildren<AIEjectPilot>(true).gameObject;
+        Debug.Log("Got ejector seat!");
+
+        GameObject ejectorSeat = Instantiate(ejectorSeatPrefab, health.transform);
+        ejectorSeat.transform.localPosition = position;
+        ejectorSeat.transform.localRotation = Quaternion.identity;
+
+        AIEjectPilot ejectPilot = ejectorSeat.GetComponent<AIEjectPilot>();
+        health.OnDeath.AddListener(ejectPilot.BeginEjectSequence);
+        ejectPilot.parentRb = rb;
     }
 }

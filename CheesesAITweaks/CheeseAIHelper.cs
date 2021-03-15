@@ -82,41 +82,90 @@ public class CheeseAIHelper : MonoBehaviour
         return VectorUtils.FullRangePerlinNoise((Time.time + throttleTimeOffset) / frequncy, throttleOffset) * CheesesAITweaks.settings.controlNoiseIntensity;
     }
 
-    public void RockWings() {
+    public void BeginContact() {
         if (wingRockRoutine == null) {
             ai.commandState = AIPilot.CommandStates.Override;
-            wingRockRoutine = StartCoroutine(WingRockRoutine());
+            wingRockRoutine = StartCoroutine(BeginContactRoutine());
         }
     }
 
-    private IEnumerator WingRockRoutine()
+    private IEnumerator BeginContactRoutine()
     {
-        Debug.Log("Rocking wings!");
+        Debug.Log("Begining contact!");
 
         float startTime = Time.time;
         Vector3 direction = rb.velocity.normalized;
         Vector3 right = Vector3.Cross(direction, Vector3.up);
         Vector3 up = Vector3.Cross(right, direction);
 
+        //random delay so ai are not synchronised
+        startTime = Time.time + UnityEngine.Random.value;
         while (true)
         {
             ai.autoPilot.steerMode = AutoPilot.SteerModes.Stable;
             ai.autoPilot.targetPosition = ai.transform.position + direction * 1000f;
-            //ai.autoPilot.targetSpeed = ai.maxSpeed;
 
-            ai.autoPilot.SetOverrideRollTarget(up + right * Mathf.Sin((Time.time - startTime) * Mathf.PI));
-
-            if (Time.time - startTime > 2)
+            if (Time.time - startTime > 1)
             {
                 break;
             }
             yield return null;
         }
 
-        Debug.Log("Wing rock complete!");
+        if (CheesesAITweaks.settings.dropTankMode == CheesesAITweaks.DropTankMode.DropOnContact && HasDroptanks()) {
+            ai.wm.MarkDroptanksToJettison();
+            ai.wm.JettisonMarkedItems();
+
+            startTime = Time.time;
+            while (true)
+            {
+                ai.autoPilot.steerMode = AutoPilot.SteerModes.Stable;
+                ai.autoPilot.targetPosition = ai.transform.position + direction * 1000f;
+
+                if (Time.time - startTime > 1f)
+                {
+                    break;
+                }
+                yield return null;
+            }
+        }
+
+        //rock wings to indicate we have seen a hostile
+        if (CheesesAITweaks.settings.rockWingsOnContact)
+        {
+            startTime = Time.time;
+            while (true)
+            {
+                ai.autoPilot.steerMode = AutoPilot.SteerModes.Stable;
+                ai.autoPilot.targetPosition = ai.transform.position + direction * 1000f;
+                //ai.autoPilot.targetSpeed = ai.maxSpeed;
+
+                ai.autoPilot.SetOverrideRollTarget(up + right * Mathf.Sin((Time.time - startTime) * Mathf.PI));
+
+                if (Time.time - startTime > 2)
+                {
+                    break;
+                }
+                yield return null;
+            }
+        }
+
+        Debug.Log("Begin contact routine complete, proceeding to combat!");
         ai.commandState = AIPilot.CommandStates.Combat;
 
         yield break;
+    }
+
+    private bool HasDroptanks() {
+        for (int i = 0; i < ai.wm.equipCount; i++)
+        {
+            HPEquippable equip = ai.wm.GetEquip(i);
+            if (equip && equip is HPEquipDropTank)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void OnDestroy() {

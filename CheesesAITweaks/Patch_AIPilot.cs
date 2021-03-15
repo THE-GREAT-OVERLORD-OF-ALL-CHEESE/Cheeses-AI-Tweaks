@@ -71,15 +71,15 @@ class Patch_AIPilot_SetCollidersToVessel
 [HarmonyPatch(typeof(AIPilot), "UpdateTargets")]
 class Patch_AIPilot_UpdateTargets
 {
-    [HarmonyPrefix]
+    [HarmonyPostfix]
     static void Postfix(AIPilot __instance)
     {
-        if (CheesesAITweaks.settings.rockWingsOnContact) {
+        if (CheesesAITweaks.settings.rockWingsOnContact || CheesesAITweaks.settings.dropTankMode == CheesesAITweaks.DropTankMode.DropOnContact) {
             if (CheesesAITweaks.aiToHelper.ContainsKey(__instance))
             {
                 CheeseAIHelper helper = CheesesAITweaks.aiToHelper[__instance];
                 if (__instance.commandState == AIPilot.CommandStates.Combat && helper.lastInCombat == false) {
-                    helper.RockWings();
+                    helper.BeginContact();
                 }
             }
         }

@@ -66,6 +66,7 @@
     <Compile Include="Main.cs" />
     <Compile Include="Patch_AIPilot.cs" />
     <Compile Include="Patch_Autopilot.cs" />
+    <Compile Include="Patch_UnitSpawner.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
