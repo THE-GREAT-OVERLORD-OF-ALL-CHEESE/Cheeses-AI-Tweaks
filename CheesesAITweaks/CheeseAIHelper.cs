@@ -11,6 +11,7 @@ public class CheeseAIHelper : MonoBehaviour
     public AutoPilot ap;
     public AIPilot ai;
     public Rigidbody rb;
+    public RefuelPlane rp;
 
     public float pitchOffset;
     public float yawOffset;
@@ -53,6 +54,7 @@ public class CheeseAIHelper : MonoBehaviour
         }
 
         rb = GetComponent<Rigidbody>();
+        rp = GetComponent<RefuelPlane>();
 
         largeAircraft = ai.parkingSize >= 20;
 
@@ -80,6 +82,17 @@ public class CheeseAIHelper : MonoBehaviour
     public float GetThottleNoise()
     {
         return VectorUtils.FullRangePerlinNoise((Time.time + throttleTimeOffset) / frequncy, throttleOffset) * CheesesAITweaks.settings.controlNoiseIntensity;
+    }
+
+    public bool CanApplyNoise() {
+        if (rp != null)
+        {
+            if (rp.hasTargetRefuelPort && CheesesAITweaks.settings.allowRefuelingNoise == false)
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     public void BeginContact() {

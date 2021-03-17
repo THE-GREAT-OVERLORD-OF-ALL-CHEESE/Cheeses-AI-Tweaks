@@ -16,21 +16,23 @@ class Patch_Autopilot_UpdateAutopilot
         if (CheesesAITweaks.settings.controlNoiseEnabled) {
             if (CheesesAITweaks.apToHelper.ContainsKey(__instance)) {
                 CheeseAIHelper helper = CheesesAITweaks.apToHelper[__instance];
+                if (helper.CanApplyNoise()) {
 
-                Traverse apTraverse = new Traverse(__instance);
-                Vector3 output = apTraverse.Field("output").GetValue<Vector3>() + helper.GetControlNoise();
-                float outputThrottle = apTraverse.Field("outputThrottle").GetValue<float>() + helper.GetThottleNoise();
-                for (int i = 0; i < __instance.outputs.Length; i++)
-                {
-                    __instance.outputs[i].SetPitchYawRoll(output);
-                    __instance.outputs[i].SetThrottle(outputThrottle);
-                }
-
-                if (__instance.controlThrottle)
-                {
-                    foreach (ModuleEngine moduleEngine in __instance.engines)
+                    Traverse apTraverse = new Traverse(__instance);
+                    Vector3 output = apTraverse.Field("output").GetValue<Vector3>() + helper.GetControlNoise();
+                    float outputThrottle = apTraverse.Field("outputThrottle").GetValue<float>() + helper.GetThottleNoise();
+                    for (int i = 0; i < __instance.outputs.Length; i++)
                     {
-                        moduleEngine.SetThrottle(outputThrottle);
+                        __instance.outputs[i].SetPitchYawRoll(output);
+                        __instance.outputs[i].SetThrottle(outputThrottle);
+                    }
+
+                    if (__instance.controlThrottle)
+                    {
+                        foreach (ModuleEngine moduleEngine in __instance.engines)
+                        {
+                            moduleEngine.SetThrottle(outputThrottle);
+                        }
                     }
                 }
             }

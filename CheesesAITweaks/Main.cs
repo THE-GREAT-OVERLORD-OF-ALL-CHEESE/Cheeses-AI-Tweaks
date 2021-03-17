@@ -20,6 +20,7 @@ public class CheesesAISettings
     public float controlNoiseLargeAircraftFrequency = 5f;
 
     public int controlNoiseLayers = 3;
+    public bool allowRefuelingNoise = false;
 
     public bool rockWingsOnContact = true;
 
@@ -60,6 +61,7 @@ public class CheesesAITweaks : VTOLMOD
     public UnityAction<float> controlNoiseLargeAircraftFrequency_changed;
 
     public UnityAction<int> controlNoiseLayers_changed;
+    public UnityAction<bool> allowRefuelingNoise_changed;
 
     public UnityAction<bool> rockWingsOnContact_changed;
 
@@ -126,6 +128,11 @@ public class CheesesAITweaks : VTOLMOD
         modSettings.CreateCustomLabel("This is the ammount of perlin noise layers used to create the noise");
         modSettings.CreateIntSetting("(Default = 3)", controlNoiseLayers_changed, settings.controlNoiseLayers, 0, 5);
 
+        allowRefuelingNoise_changed += allowRefuelingNoise_Setting;
+        modSettings.CreateCustomLabel("Allow noise when refueling another aircraft:");
+        modSettings.CreateCustomLabel("Makes air to air refueling much harder");
+        modSettings.CreateBoolSetting("(Default = false)", allowRefuelingNoise_changed, settings.allowRefuelingNoise);
+
         modSettings.CreateCustomLabel("");
 
         
@@ -162,8 +169,8 @@ public class CheesesAITweaks : VTOLMOD
         modSettings.CreateCustomLabel("");
 
         modSettings.CreateCustomLabel("AI aircraft don't have collisions on the ground normally,");
-        modSettings.CreateCustomLabel("You can enable them, but the AI could get stuck on missions with many taxiing aircraft");
-        modSettings.CreateCustomLabel("You can enable them, but the AI could get stuck on missions with many taxiing aircraft");
+        modSettings.CreateCustomLabel("You can enable them, but the AI could get stuck");
+        modSettings.CreateCustomLabel("on missions with many taxiing aircraft");
 
         modSettings.CreateCustomLabel("");
 
@@ -277,6 +284,12 @@ public class CheesesAITweaks : VTOLMOD
         settingsChanged = true;
     }
 
+    public void allowRefuelingNoise_Setting(bool newval)
+    {
+        settings.allowRefuelingNoise = newval;
+        settingsChanged = true;
+    }
+
     public void rockWingsOnContact_Setting(bool newval)
     {
         settings.rockWingsOnContact = newval;
@@ -307,7 +320,7 @@ public class CheesesAITweaks : VTOLMOD
         settingsChanged = true;
     }
 
-    public void AddEjectorSeat(Health health, Rigidbody rb, Vector3 position)
+    public AIEjectPilot AddEjectorSeat(Health health, Rigidbody rb, Vector3 position)
     {
         Debug.Log("Trying to get ejector seat!");
         GameObject ejectorSeatPrefab = UnitCatalogue.GetUnitPrefab("FA-26B AI").GetComponentInChildren<AIEjectPilot>(true).gameObject;
@@ -320,5 +333,48 @@ public class CheesesAITweaks : VTOLMOD
         AIEjectPilot ejectPilot = ejectorSeat.GetComponent<AIEjectPilot>();
         health.OnDeath.AddListener(ejectPilot.BeginEjectSequence);
         ejectPilot.parentRb = rb;
+        ejectPilot.OnBegin.RemoveAllListeners();
+        return ejectPilot;
+    }
+
+    public GameObject AddBomberDoors(Transform aircraft, AIEjectPilot ejector, bool rightDoor)
+    {
+        GameObject ejectorDoorPrefab;
+        Debug.Log("Trying to get ejector door!");
+        if (rightDoor)
+        {
+            ejectorDoorPrefab = UnitCatalogue.GetUnitPrefab("ABomberAI").transform.Find("CockpitPart").Find("ejectPanelRight.002").gameObject;
+        }
+        else {
+            ejectorDoorPrefab = UnitCatalogue.GetUnitPrefab("ABomberAI").transform.Find("CockpitPart").Find("ejectPanelLeft.002").gameObject;
+        }
+        Debug.Log("Got ejector door!");
+
+        GameObject ejectorDoor = Instantiate(ejectorDoorPrefab, aircraft);
+        ejectorDoor.transform.localPosition = new Vector3(0, -3.582781f, 7.093267f);
+        ejectorDoor.transform.localRotation = Quaternion.Euler(-90,0,0);
+
+        ejectorDoor.SetActive(false);
+        ejector.canopyObject = ejectorDoor;
+        ejector.canopyBooster = ejectorDoor.GetComponentInChildren<SolidBooster>();
+        ejector.OnBegin.AddListener(delegate { ejectorDoor.SetActive(true); });
+        return ejectorDoor;
+    }
+
+    public AIEjectPilot AddFACockpit(Health health, Rigidbody rb, Vector3 position)
+    {
+        Debug.Log("Trying to get ejector seat!");
+        GameObject ejectorSeatPrefab = UnitCatalogue.GetUnitPrefab("FA-26B AI").GetComponentInChildren<AIEjectPilot>(true).gameObject;
+        Debug.Log("Got ejector seat!");
+
+        GameObject ejectorSeat = Instantiate(ejectorSeatPrefab, health.transform);
+        ejectorSeat.transform.localPosition = position;
+        ejectorSeat.transform.localRotation = Quaternion.identity;
+
+        AIEjectPilot ejectPilot = ejectorSeat.GetComponent<AIEjectPilot>();
+        health.OnDeath.AddListener(ejectPilot.BeginEjectSequence);
+        ejectPilot.parentRb = rb;
+        ejectPilot.OnBegin.RemoveAllListeners();
+        return ejectPilot;
     }
 }
