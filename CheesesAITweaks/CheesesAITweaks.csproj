@@ -64,12 +64,14 @@
   <ItemGroup>
     <Compile Include="AICrewBailer.cs" />
     <Compile Include="CheeseAIHelper.cs" />
+    <Compile Include="CheeseSetupUnits.cs" />
     <Compile Include="Main.cs" />
-    <Compile Include="Patch_AIPilot.cs" />
-    <Compile Include="Patch_Autopilot.cs" />
-    <Compile Include="Patch_UnitSpawner.cs" />
+    <Compile Include="Patches\Patch_AIPilot.cs" />
+    <Compile Include="Patches\Patch_Autopilot.cs" />
+    <Compile Include="Patches\Patch_UnitSpawner.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>IF EXIST "C:\Program Files (x86)\Steam\steamapps\common\VTOL VR\VTOLVR_ModLoader\VTOLVR-ModLoader.exe" (

@@ -29,7 +29,7 @@ class AICrewBailer : MonoBehaviour
         crew = new AIEjectPilot[crewAmmount];
         for (int i = 0; i < crewAmmount;  i++) {
             GameObject ejectorSeat = Instantiate(ejectorSeatPrefab, transform);
-            ejectorSeat.transform.localPosition = spawnPositions[UnityEngine.Random.Range(0, spawnPositions.Length-1)];
+            ejectorSeat.transform.localPosition = spawnPositions[UnityEngine.Random.Range(0, spawnPositions.Length)];
             ejectorSeat.transform.localRotation = Quaternion.identity;
             ejectorSeat.transform.parent = transform;
 

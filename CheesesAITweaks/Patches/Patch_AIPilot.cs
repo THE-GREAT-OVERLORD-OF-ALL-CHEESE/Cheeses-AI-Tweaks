@@ -10,7 +10,7 @@ using UnityEngine;
 [HarmonyPatch(typeof(AIPilot), "Start")]
 class Patch_AIPilot_Start
 {
-    [HarmonyPrefix]
+    [HarmonyPostfix]
     static void Postfix(AIPilot __instance)
     {
         __instance.gameObject.AddComponent<CheeseAIHelper>();

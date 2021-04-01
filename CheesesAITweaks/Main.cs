@@ -30,6 +30,10 @@ public class CheesesAISettings
 
     public CheesesAITweaks.CollisionMode collisionMode = CheesesAITweaks.CollisionMode.Normal;
 
+    public bool allAIHaveRWR = false;
+    public bool allAICanEvade = true;
+    public bool tweakTargetFinders = true;
+
     public bool invertedAI = false;
 }
 
@@ -70,6 +74,10 @@ public class CheesesAITweaks : VTOLMOD
     public UnityAction<bool> enemyEjectorSeats_changed;
 
     public UnityAction<int> collisionMode_changed;
+
+    public UnityAction<bool> allAIHaveRWR_changed;
+    public UnityAction<bool> allAICanEvade_changed;
+    public UnityAction<bool> tweakTargetFinders_changed;
 
     public UnityAction<bool> invertedAI_changed;
 
@@ -173,7 +181,30 @@ public class CheesesAITweaks : VTOLMOD
         modSettings.CreateCustomLabel("on missions with many taxiing aircraft");
 
         modSettings.CreateCustomLabel("");
+        modSettings.CreateCustomLabel("Detection Settings");
 
+        allAIHaveRWR_changed += allAIHaveRWR_Setting;
+        modSettings.CreateCustomLabel("RWR on all AI:");
+        modSettings.CreateCustomLabel("Enemy AI do not normally have RWR");
+        modSettings.CreateCustomLabel("This will give them a RWR and make them more situationally aware");
+        modSettings.CreateBoolSetting("(Default = false)", allAIHaveRWR_changed, settings.allAIHaveRWR);
+
+        allAICanEvade_changed += allAICanEvade_Setting;
+        modSettings.CreateCustomLabel("RWR on all AI:");
+        modSettings.CreateCustomLabel("AWACS and the KC-49 cannot normaly evade missiles");
+        modSettings.CreateBoolSetting("(Default = true)", allAICanEvade_changed, settings.allAICanEvade);
+
+        /*
+        tweakTargetFinders_changed += tweakTargetFinders_Setting;
+        modSettings.CreateCustomLabel("Tweak Visual Target Finders:");
+        modSettings.CreateBoolSetting("(Default = true)", tweakTargetFinders_changed, settings.tweakTargetFinders);
+        */
+
+        modSettings.CreateCustomLabel("");
+
+        modSettings.CreateCustomLabel("Joke Settings");
+
+        modSettings.CreateCustomLabel("");
 
         invertedAI_changed += invertedAI_Setting;
         modSettings.CreateCustomLabel("Inverted AI:");
@@ -314,6 +345,22 @@ public class CheesesAITweaks : VTOLMOD
         settingsChanged = true;
     }
 
+    public void allAIHaveRWR_Setting(bool newval)
+    {
+        settings.allAIHaveRWR = newval;
+        settingsChanged = true;
+    }
+    public void allAICanEvade_Setting(bool newval)
+    {
+        settings.allAICanEvade = newval;
+        settingsChanged = true;
+    }
+    public void tweakTargetFinders_Setting(bool newval)
+    {
+        settings.tweakTargetFinders = newval;
+        settingsChanged = true;
+    }
+
     public void invertedAI_Setting(bool newval)
     {
         settings.invertedAI = newval;
@@ -361,20 +408,30 @@ public class CheesesAITweaks : VTOLMOD
         return ejectorDoor;
     }
 
-    public AIEjectPilot AddFACockpit(Health health, Rigidbody rb, Vector3 position)
+    public GameObject AddFACockpit(Transform aircraftTransform, Vector3 position, Vector3 scale)
     {
-        Debug.Log("Trying to get ejector seat!");
-        GameObject ejectorSeatPrefab = UnitCatalogue.GetUnitPrefab("FA-26B AI").GetComponentInChildren<AIEjectPilot>(true).gameObject;
-        Debug.Log("Got ejector seat!");
+        Debug.Log("Trying to get cockpit interior!");
+        GameObject cockpitPrefab = FindObject(UnitCatalogue.GetUnitPrefab("FA-26B AI").transform, "lowPolyInterior").gameObject;
+        Debug.Log("Got cockpit interior!");
 
-        GameObject ejectorSeat = Instantiate(ejectorSeatPrefab, health.transform);
-        ejectorSeat.transform.localPosition = position;
-        ejectorSeat.transform.localRotation = Quaternion.identity;
+        GameObject cockpit = Instantiate(cockpitPrefab, aircraftTransform);
+        cockpit.transform.localPosition = position;
+        cockpit.transform.localEulerAngles = new Vector3(-90, 0, -180f);
+        cockpit.transform.localScale = scale;
 
-        AIEjectPilot ejectPilot = ejectorSeat.GetComponent<AIEjectPilot>();
-        health.OnDeath.AddListener(ejectPilot.BeginEjectSequence);
-        ejectPilot.parentRb = rb;
-        ejectPilot.OnBegin.RemoveAllListeners();
-        return ejectPilot;
+        return cockpit;
+    }
+
+    public Transform FindObject(Transform parent, string name)
+    {
+        Transform[] children = parent.GetComponentsInChildren<Transform>(true);
+        foreach (Transform child in children)
+        {
+            if (child.name == name)
+            {
+                return child;
+            }
+        }
+        return null;
     }
 }
