@@ -22,6 +22,9 @@ public class CheesesAISettings
     public int controlNoiseLayers = 3;
     public bool allowRefuelingNoise = false;
 
+    public float formationDriftIntensity = 3f;
+    public float formationDriftFrequency = 5f;
+
     public bool rockWingsOnContact = true;
 
     public CheesesAITweaks.DropTankMode dropTankMode = CheesesAITweaks.DropTankMode.DropOnContact;
@@ -34,6 +37,7 @@ public class CheesesAISettings
     public bool allAICanEvade = true;
     public bool tweakTargetFinders = true;
 
+    public bool eyes = false;
     public bool invertedAI = false;
 }
 
@@ -67,6 +71,9 @@ public class CheesesAITweaks : VTOLMOD
     public UnityAction<int> controlNoiseLayers_changed;
     public UnityAction<bool> allowRefuelingNoise_changed;
 
+    public UnityAction<float> formationDriftIntensity_changed;
+    public UnityAction<float> formationDriftFrequency_changed;
+
     public UnityAction<bool> rockWingsOnContact_changed;
 
     public UnityAction<int> dropTankMode_changed;
@@ -79,11 +86,13 @@ public class CheesesAITweaks : VTOLMOD
     public UnityAction<bool> allAICanEvade_changed;
     public UnityAction<bool> tweakTargetFinders_changed;
 
+    public UnityAction<bool> eyes_changed;
     public UnityAction<bool> invertedAI_changed;
-
 
     public static Dictionary<AutoPilot, CheeseAIHelper> apToHelper;
     public static Dictionary<AIPilot, CheeseAIHelper> aiToHelper;
+
+    public GameObject googlyEyePrefab;
 
     public override void ModLoaded()
     {
@@ -103,6 +112,8 @@ public class CheesesAITweaks : VTOLMOD
 
         settings = new CheesesAISettings();
         LoadFromFile();
+
+        StartCoroutine(LoadAssetBundle());
 
         Settings modSettings = new Settings(this);
         modSettings.CreateCustomLabel("Cheese's AI Tweaks Settings");
@@ -132,7 +143,7 @@ public class CheesesAITweaks : VTOLMOD
         modSettings.CreateFloatSetting("(Default = 5)", controlNoiseLargeAircraftFrequency_changed, settings.controlNoiseLargeAircraftFrequency, 0, 60);
 
         controlNoiseLayers_changed += controlNoiseLayers_Setting;
-        modSettings.CreateCustomLabel("Control Noise Frequency:");
+        modSettings.CreateCustomLabel("Control Noise Layers:");
         modSettings.CreateCustomLabel("This is the ammount of perlin noise layers used to create the noise");
         modSettings.CreateIntSetting("(Default = 3)", controlNoiseLayers_changed, settings.controlNoiseLayers, 0, 5);
 
@@ -140,6 +151,16 @@ public class CheesesAITweaks : VTOLMOD
         modSettings.CreateCustomLabel("Allow noise when refueling another aircraft:");
         modSettings.CreateCustomLabel("Makes air to air refueling much harder");
         modSettings.CreateBoolSetting("(Default = false)", allowRefuelingNoise_changed, settings.allowRefuelingNoise);
+
+        /*formationDriftIntensity_changed += formationDriftIntensity_Setting;
+        modSettings.CreateCustomLabel("Formation Drift Intensity:");
+        modSettings.CreateCustomLabel("This is the radius the aircraft can drift from its target");
+        modSettings.CreateFloatSetting("(Default = 3m)", formationDriftIntensity_changed, settings.formationDriftIntensity, 0, 10);
+
+        formationDriftFrequency_changed += formationDriftFrequency_Setting;
+        modSettings.CreateCustomLabel("Formation Drift Frequency:");
+        modSettings.CreateCustomLabel("This is the frequency at which the aircraft drifts in formation");
+        modSettings.CreateFloatSetting("(Default = 5)", formationDriftFrequency_changed, settings.formationDriftFrequency, 1, 60);*/
 
         modSettings.CreateCustomLabel("");
 
@@ -206,9 +227,14 @@ public class CheesesAITweaks : VTOLMOD
 
         modSettings.CreateCustomLabel("");
 
+        eyes_changed += eyes_Setting;
+        modSettings.CreateCustomLabel("Googly Eyes:");
+        modSettings.CreateCustomLabel("Adds googly eyes to various AI units");
+        modSettings.CreateBoolSetting("(Default = false)", eyes_changed, settings.eyes);
+
         invertedAI_changed += invertedAI_Setting;
         modSettings.CreateCustomLabel("Inverted AI:");
-        modSettings.CreateCustomLabel("Causes AI the fly upside down");
+        modSettings.CreateCustomLabel("Causes the AI to fly upside down");
         modSettings.CreateBoolSetting("(Default = false)", invertedAI_changed, settings.invertedAI);
 
         modSettings.CreateCustomLabel("");
@@ -321,6 +347,18 @@ public class CheesesAITweaks : VTOLMOD
         settingsChanged = true;
     }
 
+    public void formationDriftIntensity_Setting(float newval)
+    {
+        settings.formationDriftIntensity = newval;
+        settingsChanged = true;
+    }
+
+    public void formationDriftFrequency_Setting(float newval)
+    {
+        settings.formationDriftFrequency = newval;
+        settingsChanged = true;
+    }
+
     public void rockWingsOnContact_Setting(bool newval)
     {
         settings.rockWingsOnContact = newval;
@@ -358,6 +396,12 @@ public class CheesesAITweaks : VTOLMOD
     public void tweakTargetFinders_Setting(bool newval)
     {
         settings.tweakTargetFinders = newval;
+        settingsChanged = true;
+    }
+
+    public void eyes_Setting(bool newval)
+    {
+        settings.eyes = newval;
         settingsChanged = true;
     }
 
@@ -422,6 +466,23 @@ public class CheesesAITweaks : VTOLMOD
         return cockpit;
     }
 
+    public GameObject AddGooglyEye(Transform aircraftTransform, Vector3 position, Vector3 rotation, float scale, bool mirror = false)
+    {
+        GameObject googlyEye = Instantiate(googlyEyePrefab, aircraftTransform);
+        googlyEye.transform.localPosition = position;
+        googlyEye.transform.localRotation = Quaternion.Euler(rotation);
+        googlyEye.transform.localScale = Vector3.one * scale;
+
+        GooglyEye eye = googlyEye.AddComponent<GooglyEye>();
+        eye.scale = scale;
+
+        if (mirror) {
+            AddGooglyEye(aircraftTransform, new Vector3(-position.x, position.y, position.z), new Vector3(rotation.x, -rotation.y, rotation.z), scale);
+        }
+
+        return googlyEye;
+    }
+
     public Transform FindObject(Transform parent, string name)
     {
         Transform[] children = parent.GetComponentsInChildren<Transform>(true);
@@ -433,5 +494,28 @@ public class CheesesAITweaks : VTOLMOD
             }
         }
         return null;
+    }
+
+    private IEnumerator LoadAssetBundle()
+    {
+        Debug.Log("Checking " + ModFolder + @"\eyes.ab");
+        if (!File.Exists(ModFolder + @"\eyes.ab"))
+        {
+            Debug.Log("Asset bundle does not exist");
+            yield break;
+        }
+        AssetBundleCreateRequest request = AssetBundle.LoadFromFileAsync(ModFolder + @"\eyes.ab");
+        yield return request;
+
+        AssetBundleRequest eyeRequest = request.assetBundle.LoadAssetAsync("Googly Eye", typeof(GameObject));
+        yield return eyeRequest;
+        if (eyeRequest.asset == null)
+        {
+            Debug.Log("Couldnt find googly eye prefab");
+            yield break;
+        }
+        googlyEyePrefab = eyeRequest.asset as GameObject;
+
+        Debug.Log("Googly Eye prefab loaded!");
     }
 }

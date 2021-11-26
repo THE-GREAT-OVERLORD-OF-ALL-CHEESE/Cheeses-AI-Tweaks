@@ -18,5 +18,6 @@ class Patch_UnitSpawner_CreateUnspawnedUnit
         CheeseSetupUnits.SetupRWR(__instance);
         CheeseSetupUnits.SetupEvasiveManuevers(__instance);
         CheeseSetupUnits.SetupVisualTargetFinders(__instance);
+        CheeseSetupUnits.SetupGooglyEyes(__instance);
     }
 }

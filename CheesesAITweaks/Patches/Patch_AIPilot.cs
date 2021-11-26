@@ -85,3 +85,16 @@ class Patch_AIPilot_UpdateTargets
         }
     }
 }
+
+/*[HarmonyPatch(typeof(AIPilot), "FlyFormation")]
+class Patch_AIPilot_FlyFormation
+{
+    [HarmonyPrefix]
+    static void Prefix(AIPilot __instance, Transform formationTf, Vector3 leaderVelocity)
+    {
+        if (CheesesAITweaks.settings.controlNoiseEnabled)
+        {
+            formationTf.localPosition = __instance.formationLeader.GetLocalFormationPosition(0);
+        }
+    }
+}*/

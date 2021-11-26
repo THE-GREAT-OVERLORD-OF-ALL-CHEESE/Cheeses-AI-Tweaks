@@ -131,4 +131,57 @@ public static class CheeseSetupUnits
             }
         }
     }
+
+    public static void SetupGooglyEyes(UnitSpawner __instance)
+    {
+        if (CheesesAITweaks.settings.enemyEjectorSeats)
+        {
+            Traverse unitSpawnerTraverse = Traverse.Create(__instance);
+            UnitSpawn unitSpawn = unitSpawnerTraverse.Field("_spawnedUnit").GetValue<UnitSpawn>();
+            switch (__instance.unitID)
+            {
+                case "FA-26B AI":
+                    CheesesAITweaks.instance.AddGooglyEye(unitSpawn.transform, new Vector3(0.66f, 1.254f, 5.922f), new Vector3(-20f, 70f, 0f), 1f, true);
+                    break;
+                case "F-45A AI":
+                    CheesesAITweaks.instance.AddGooglyEye(unitSpawn.transform, new Vector3(0.536f, 0.907f, 5.73f), new Vector3(-20f, 70f, 0f), 1f, true);
+                    break;
+                case "MQ-31":
+                    CheesesAITweaks.instance.AddGooglyEye(unitSpawn.transform, new Vector3(0.923f, 0.907f, 5.73f), new Vector3(-20f, 80f, 0f), 1f, true);
+                    break;
+                case "ASF-30":
+                    CheesesAITweaks.instance.AddGooglyEye(unitSpawn.transform, new Vector3(0.675f, 1.13f, 8.16f), new Vector3(-20f, 80f, 0f), 1.2f, true);
+                    break;
+                case "ASF-33":
+                    CheesesAITweaks.instance.AddGooglyEye(unitSpawn.transform, new Vector3(0.661f, 1.337f, 8.517f), new Vector3(-25f, 80f, 0f), 1.2f, true);
+                    break;
+                case "ASF-58":
+                    CheesesAITweaks.instance.AddGooglyEye(unitSpawn.transform, new Vector3(1.01f, 1.215f, 12.74f), new Vector3(-30f, 80f, 0f), 2f, true);
+                    break;
+                case "AIUCAV":
+                    CheesesAITweaks.instance.AddGooglyEye(unitSpawn.transform, new Vector3(1.01f, 0.63f, 2.65f), new Vector3(-70, 60, 0), 2f, true);
+                    break;
+                case "KC-49":
+                    CheesesAITweaks.instance.AddGooglyEye(unitSpawn.transform, new Vector3(3.19f, 1.439f, 32.283f), new Vector3(-20, 80, 0), 3f, true);
+                    CheesesAITweaks.instance.AddGooglyEye(unitSpawn.transform, new Vector3(1.349f, -2.849f, -24.2753f), new Vector3(60, 150, 0), 2f, true);
+                    break;
+                case "E-4":
+                    CheesesAITweaks.instance.AddGooglyEye(unitSpawn.transform, new Vector3(3.19f, 1.439f, 32.283f), new Vector3(-20, 80, 0), 3f, true);
+                    CheesesAITweaks.instance.AddGooglyEye(unitSpawn.transform, new Vector3(2f, 12.85f, -2.371f), new Vector3(0, 10, 0), 2f, true);
+                    break;
+                case "AV-42CAI":
+                    CheesesAITweaks.instance.AddGooglyEye(unitSpawn.transform, new Vector3(0.988f, 0.119f, 5.543f), new Vector3(-5, 80, 0), 1f, true);
+                    break;
+                case "GAV-25":
+                    CheesesAITweaks.instance.AddGooglyEye(unitSpawn.transform, new Vector3(0.872f, 0.472f, 4.464f), new Vector3(-15, 80, 0), 1f, true);
+                    break;
+                case "ABomberAI":
+                case "EBomberAI":
+                    CheesesAITweaks.instance.AddGooglyEye(unitSpawn.transform, new Vector3(0.788f, -1.08f, 22.465f), new Vector3(70, 90, 0), 1.5f, true);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
 }

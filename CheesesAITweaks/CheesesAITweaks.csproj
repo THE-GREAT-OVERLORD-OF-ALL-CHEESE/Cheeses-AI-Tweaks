@@ -51,6 +51,9 @@
     <Reference Include="UnityEngine">
       <HintPath>..\Dependencies\UnityEngine.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.AssetBundleModule">
+      <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\Dependencies\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
@@ -62,11 +65,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AICrewBailer.cs" />
-    <Compile Include="CheeseAIHelper.cs" />
+    <Compile Include="Monobehaviours\AICrewBailer.cs" />
+    <Compile Include="Monobehaviours\CheeseAIHelper.cs" />
     <Compile Include="CheeseSetupUnits.cs" />
     <Compile Include="Main.cs" />
+    <Compile Include="Monobehaviours\GooglyEyes.cs" />
     <Compile Include="Patches\Patch_AIPilot.cs" />
+    <Compile Include="Patches\Patch_AirFormationLeader.cs" />
     <Compile Include="Patches\Patch_Autopilot.cs" />
     <Compile Include="Patches\Patch_UnitSpawner.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -74,8 +79,6 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>IF EXIST "C:\Program Files (x86)\Steam\steamapps\common\VTOL VR\VTOLVR_ModLoader\VTOLVR-ModLoader.exe" (
-copy "$(TargetPath)" "C:\Program Files (x86)\Steam\steamapps\common\VTOL VR\VTOLVR_ModLoader\projects\My Mods\Cheeses AI Tweaks\Builds\CheesesAITweaks.dll"
-)</PostBuildEvent>
+    <PostBuildEvent>copy "$(TargetPath)" "C:\Program Files (x86)\Steam\steamapps\common\VTOL VR\VTOLVR_ModLoader\projects\My Mods\Cheeses AI Tweaks\Builds\CheesesAITweaks.dll"</PostBuildEvent>
   </PropertyGroup>
 </Project>

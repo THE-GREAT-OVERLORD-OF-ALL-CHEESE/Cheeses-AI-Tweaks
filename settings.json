@@ -1,0 +1,1 @@
+{"controlNoiseEnabled":true,"controlNoiseIntensity":0.05,"controlNoiseFrequency":2.0,"controlNoiseLargeAircraftFrequency":5.0,"controlNoiseLayers":3,"allowRefuelingNoise":false,"rockWingsOnContact":true,"dropTankMode":1,"enemyEjectorSeats":true,"collisionMode":0,"allAIHaveRWR":false,"allAICanEvade":true,"tweakTargetFinders":true,"invertedAI":false}
