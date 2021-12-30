@@ -97,8 +97,14 @@ public static class CheeseSetupUnits
                 case "KC-49":
                     GameObject rwrObject = new GameObject();
                     rwrObject.transform.parent = unitSpawn.actor.transform;
-                    ModuleRWR rwr = rwrObject.AddComponent<ModuleRWR>();
-                    unitSpawn.actor.gameObject.GetComponent<AIPilot>().moduleRWR = rwr;
+
+                    ModuleRWR rwr = unitSpawn.actor.gameObject.GetComponent<ModuleRWR>();
+
+                    if (rwr == null)
+                    {
+                        rwr = rwrObject.AddComponent<ModuleRWR>();
+                        unitSpawn.actor.gameObject.GetComponent<AIPilot>().moduleRWR = rwr;
+                    }
                     break;
             }
         }
@@ -134,7 +140,7 @@ public static class CheeseSetupUnits
 
     public static void SetupGooglyEyes(UnitSpawner __instance)
     {
-        if (CheesesAITweaks.settings.enemyEjectorSeats)
+        if (CheesesAITweaks.settings.eyes)
         {
             Traverse unitSpawnerTraverse = Traverse.Create(__instance);
             UnitSpawn unitSpawn = unitSpawnerTraverse.Field("_spawnedUnit").GetValue<UnitSpawn>();

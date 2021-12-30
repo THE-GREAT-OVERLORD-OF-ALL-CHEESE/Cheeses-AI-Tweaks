@@ -69,10 +69,12 @@
     <Compile Include="Monobehaviours\CheeseAIHelper.cs" />
     <Compile Include="CheeseSetupUnits.cs" />
     <Compile Include="Main.cs" />
+    <Compile Include="Monobehaviours\CheeseShipRocker.cs" />
     <Compile Include="Monobehaviours\GooglyEyes.cs" />
     <Compile Include="Patches\Patch_AIPilot.cs" />
     <Compile Include="Patches\Patch_AirFormationLeader.cs" />
     <Compile Include="Patches\Patch_Autopilot.cs" />
+    <Compile Include="Patches\Patch_ShipMover.cs" />
     <Compile Include="Patches\Patch_UnitSpawner.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

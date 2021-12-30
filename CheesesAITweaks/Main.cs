@@ -33,7 +33,10 @@ public class CheesesAISettings
 
     public CheesesAITweaks.CollisionMode collisionMode = CheesesAITweaks.CollisionMode.Normal;
 
-    public bool allAIHaveRWR = false;
+    public bool rockShips = false;
+    public float windSpeed = 50f;
+
+    public bool allAIHaveRWR = true;
     public bool allAICanEvade = true;
     public bool tweakTargetFinders = true;
 
@@ -81,6 +84,9 @@ public class CheesesAITweaks : VTOLMOD
     public UnityAction<bool> enemyEjectorSeats_changed;
 
     public UnityAction<int> collisionMode_changed;
+
+    public UnityAction<bool> rockShips_changed;
+    public UnityAction<float> windSpeed_changed;
 
     public UnityAction<bool> allAIHaveRWR_changed;
     public UnityAction<bool> allAICanEvade_changed;
@@ -214,6 +220,16 @@ public class CheesesAITweaks : VTOLMOD
         modSettings.CreateCustomLabel("RWR on all AI:");
         modSettings.CreateCustomLabel("AWACS and the KC-49 cannot normaly evade missiles");
         modSettings.CreateBoolSetting("(Default = true)", allAICanEvade_changed, settings.allAICanEvade);
+
+        //rockShips_changed += rockShips_Setting;
+        //modSettings.CreateCustomLabel("Rock Ships:");
+        //modSettings.CreateCustomLabel("Should ships be rocked by the wind?");
+        //modSettings.CreateBoolSetting("(Default = true)", rockShips_changed, settings.rockShips);
+
+        //windSpeed_changed += windSpeed_Setting;
+        //modSettings.CreateCustomLabel("Wind Speed (kts):");
+        //modSettings.CreateCustomLabel("This is the windspeed used to work out how much to rock the ships");
+        //modSettings.CreateFloatSetting("(Default = 50kts)", windSpeed_changed, settings.windSpeed, 0f, 100f);
 
         /*
         tweakTargetFinders_changed += tweakTargetFinders_Setting;
@@ -393,9 +409,22 @@ public class CheesesAITweaks : VTOLMOD
         settings.allAICanEvade = newval;
         settingsChanged = true;
     }
+
     public void tweakTargetFinders_Setting(bool newval)
     {
         settings.tweakTargetFinders = newval;
+        settingsChanged = true;
+    }
+
+    public void rockShips_Setting(bool newval)
+    {
+        settings.rockShips = newval;
+        settingsChanged = true;
+    }
+
+    public void windSpeed_Setting(float newval)
+    {
+        settings.windSpeed = newval;
         settingsChanged = true;
     }
 

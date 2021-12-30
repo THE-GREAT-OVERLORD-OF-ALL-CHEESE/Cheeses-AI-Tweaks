@@ -45,10 +45,10 @@ public class GooglyEye : MonoBehaviour
 
         if (Time.deltaTime > 0)
         {
-            localAcceleration = tf.InverseTransformDirection((currentVelocity - lastVelocity) / Time.deltaTime);
+            localAcceleration = -tf.InverseTransformDirection((currentVelocity - lastVelocity));
         }
 
-        localVelocity += new Vector2(localAcceleration.x, localAcceleration.y) * -Time.deltaTime;
+        localVelocity += new Vector2(localAcceleration.x, localAcceleration.y);
         lastVelocity = currentVelocity;
     }
 
