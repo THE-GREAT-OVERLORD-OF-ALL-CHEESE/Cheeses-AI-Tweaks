@@ -36,7 +36,6 @@ public class CheesesAISettings
     public bool rockShips = false;
     public float windSpeed = 50f;
 
-    public bool allAIHaveRWR = true;
     public bool allAICanEvade = true;
     public bool tweakTargetFinders = true;
 
@@ -88,7 +87,6 @@ public class CheesesAITweaks : VTOLMOD
     public UnityAction<bool> rockShips_changed;
     public UnityAction<float> windSpeed_changed;
 
-    public UnityAction<bool> allAIHaveRWR_changed;
     public UnityAction<bool> allAICanEvade_changed;
     public UnityAction<bool> tweakTargetFinders_changed;
 
@@ -210,14 +208,8 @@ public class CheesesAITweaks : VTOLMOD
         modSettings.CreateCustomLabel("");
         modSettings.CreateCustomLabel("Detection Settings");
 
-        allAIHaveRWR_changed += allAIHaveRWR_Setting;
-        modSettings.CreateCustomLabel("RWR on all AI:");
-        modSettings.CreateCustomLabel("Enemy AI do not normally have RWR");
-        modSettings.CreateCustomLabel("This will give them a RWR and make them more situationally aware");
-        modSettings.CreateBoolSetting("(Default = false)", allAIHaveRWR_changed, settings.allAIHaveRWR);
-
         allAICanEvade_changed += allAICanEvade_Setting;
-        modSettings.CreateCustomLabel("RWR on all AI:");
+        modSettings.CreateCustomLabel("All AI can evade:");
         modSettings.CreateCustomLabel("AWACS and the KC-49 cannot normaly evade missiles");
         modSettings.CreateBoolSetting("(Default = true)", allAICanEvade_changed, settings.allAICanEvade);
 
@@ -399,11 +391,6 @@ public class CheesesAITweaks : VTOLMOD
         settingsChanged = true;
     }
 
-    public void allAIHaveRWR_Setting(bool newval)
-    {
-        settings.allAIHaveRWR = newval;
-        settingsChanged = true;
-    }
     public void allAICanEvade_Setting(bool newval)
     {
         settings.allAICanEvade = newval;

@@ -63,6 +63,7 @@ public static class CheeseSetupUnits
                     unitSpawn.transform.Find("CockpitPart").GetComponent<VehiclePart>().detachDelay = new MinMax(3, 8);
                     break;
                 case "E-4":
+                case "AEW-50":
                     AICrewBailer crewBailer = unitSpawn.actor.gameObject.AddComponent<AICrewBailer>();
                     crewBailer.SetupCrew(15, unitSpawn.GetComponent<Rigidbody>());
                     unitSpawn.actor.health.OnDeath.AddListener(crewBailer.BeginBailout);
@@ -78,38 +79,6 @@ public static class CheeseSetupUnits
         }
     }
 
-    public static void SetupRWR(UnitSpawner __instance)
-    {
-        if (CheesesAITweaks.settings.allAIHaveRWR)
-        {
-            Traverse unitSpawnerTraverse = Traverse.Create(__instance);
-            UnitSpawn unitSpawn = unitSpawnerTraverse.Field("_spawnedUnit").GetValue<UnitSpawn>();
-            switch (__instance.unitID)
-            {
-                case "AIUCAV":
-                case "GAV-25":
-                case "ASF-30":
-                case "ASF-33":
-                case "ASF-58":
-                case "EBomberAI":
-                case "ABomberAI":
-                case "E-4":
-                case "KC-49":
-                    GameObject rwrObject = new GameObject();
-                    rwrObject.transform.parent = unitSpawn.actor.transform;
-
-                    ModuleRWR rwr = unitSpawn.actor.gameObject.GetComponent<ModuleRWR>();
-
-                    if (rwr == null)
-                    {
-                        rwr = rwrObject.AddComponent<ModuleRWR>();
-                        unitSpawn.actor.gameObject.GetComponent<AIPilot>().moduleRWR = rwr;
-                    }
-                    break;
-            }
-        }
-    }
-
     public static void SetupEvasiveManuevers(UnitSpawner __instance)
     {
         if (CheesesAITweaks.settings.allAICanEvade)
@@ -120,6 +89,7 @@ public static class CheeseSetupUnits
             {
                 case "E-4":
                 case "KC-49":
+                case "AEW-50":
                     unitSpawn.actor.gameObject.GetComponent<AIPilot>().allowEvasiveManeuvers = true;
                     break;
             }
@@ -172,6 +142,7 @@ public static class CheeseSetupUnits
                     CheesesAITweaks.instance.AddGooglyEye(unitSpawn.transform, new Vector3(1.349f, -2.849f, -24.2753f), new Vector3(60, 150, 0), 2f, true);
                     break;
                 case "E-4":
+                case "AEW-50":
                     CheesesAITweaks.instance.AddGooglyEye(unitSpawn.transform, new Vector3(3.19f, 1.439f, 32.283f), new Vector3(-20, 80, 0), 3f, true);
                     CheesesAITweaks.instance.AddGooglyEye(unitSpawn.transform, new Vector3(2f, 12.85f, -2.371f), new Vector3(0, 10, 0), 2f, true);
                     break;

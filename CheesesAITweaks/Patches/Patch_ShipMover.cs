@@ -14,7 +14,7 @@ class Patch_ShipMover_Start
     {
         if (CheesesAITweaks.settings.rockShips)
         {
-            __instance.gameObject.AddComponent<CheeseShipRocker>();
+            //__instance.gameObject.AddComponent<CheeseShipRocker>();
         }
     }
 }

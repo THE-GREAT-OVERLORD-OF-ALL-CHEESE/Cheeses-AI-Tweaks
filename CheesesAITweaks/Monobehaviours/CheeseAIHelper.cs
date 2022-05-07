@@ -30,6 +30,9 @@ public class CheeseAIHelper : MonoBehaviour
 
     public Coroutine wingRockRoutine;
 
+    public Vector3 lastAimTarget = Vector3.zero;
+    public Vector3 lastRollTarget = Vector3.zero;
+
     private void Start() {
         Debug.Log("Setting up aircraft noise!");
         pitchOffset = UnityEngine.Random.Range(-10f, 10f);

@@ -11,22 +11,24 @@ using UnityEngine;
 class Patch_Autopilot_UpdateAutopilot
 {
     [HarmonyPrefix]
-    static void Postfix(AutoPilot __instance)
+    static bool Prefix(AutoPilot __instance)
     {
-        if (CheesesAITweaks.settings.controlNoiseEnabled) {
-            if (CheesesAITweaks.apToHelper.ContainsKey(__instance)) {
+        if (CheesesAITweaks.settings.controlNoiseEnabled)
+        {
+            if (CheesesAITweaks.apToHelper.ContainsKey(__instance))
+            {
                 CheeseAIHelper helper = CheesesAITweaks.apToHelper[__instance];
-                if (helper.CanApplyNoise()) {
 
-                    Traverse apTraverse = new Traverse(__instance);
-                    Vector3 output = apTraverse.Field("output").GetValue<Vector3>() + helper.GetControlNoise();
+                Traverse apTraverse = new Traverse(__instance);
+                helper.lastAimTarget = __instance.targetPosition;
+                helper.lastRollTarget = apTraverse.Field("overrideRollTarget").GetValue<Vector3>();
+                if (helper.CanApplyNoise())
+                {
+                    Vector3 output = helper.GetControlNoise();
+                    __instance.targetPosition += output * (__instance.targetPosition - __instance.referenceTransform.position).magnitude;
+                    apTraverse.Field("overrideRollTarget").SetValue(helper.lastRollTarget + output * helper.lastRollTarget.magnitude);
+
                     float outputThrottle = apTraverse.Field("outputThrottle").GetValue<float>() + helper.GetThottleNoise();
-                    for (int i = 0; i < __instance.outputs.Length; i++)
-                    {
-                        __instance.outputs[i].SetPitchYawRoll(output);
-                        __instance.outputs[i].SetThrottle(outputThrottle);
-                    }
-
                     if (__instance.controlThrottle)
                     {
                         foreach (ModuleEngine moduleEngine in __instance.engines)
@@ -35,6 +37,26 @@ class Patch_Autopilot_UpdateAutopilot
                         }
                     }
                 }
+            }
+        }
+        return true;
+    }
+}
+
+[HarmonyPatch(typeof(AutoPilot), "UpdateAutopilot")]
+class Patch_Autopilot_UpdateAutopilot2
+{
+    [HarmonyPostfix]
+    static void Postfix(AutoPilot __instance)
+    {
+        if (CheesesAITweaks.settings.controlNoiseEnabled)
+        {
+            if (CheesesAITweaks.apToHelper.ContainsKey(__instance))
+            {
+                CheeseAIHelper helper = CheesesAITweaks.apToHelper[__instance];
+                Traverse apTraverse = new Traverse(__instance);
+                __instance.targetPosition = helper.lastAimTarget;
+                apTraverse.Field("overrideRollTarget").SetValue(helper.lastRollTarget);
             }
         }
     }
@@ -58,7 +80,7 @@ class Patch_AutoPilot_RollTargetVersion2
 }
 
 [HarmonyPatch(typeof(AutoPilot), "SetOverrideRollTarget")]
-class Patch_AutoPilot_UpdateAutopilot
+class Patch_AutoPilot_SetOverrideRollTarget
 {
     [HarmonyPrefix]
     static bool Prefix(AutoPilot __instance, Vector3 rollTarget)

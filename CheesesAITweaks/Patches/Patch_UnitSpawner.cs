@@ -15,7 +15,6 @@ class Patch_UnitSpawner_CreateUnspawnedUnit
     static void Postfix(UnitSpawner __instance)
     {
         CheeseSetupUnits.SetupEjection(__instance);
-        CheeseSetupUnits.SetupRWR(__instance);
         CheeseSetupUnits.SetupEvasiveManuevers(__instance);
         CheeseSetupUnits.SetupVisualTargetFinders(__instance);
         CheeseSetupUnits.SetupGooglyEyes(__instance);
